@@ -9,7 +9,7 @@ import { join } from 'path';
 
 @Module({
   imports: [ServeStaticModule.forRoot({
-    rootPath: join(__dirname, '..', 'DatabasesHY1001-frontend/dist'),
+    rootPath: join('/root/DatabasesHY1001-frontend/dist'),
   })],
   controllers: [AppController, ApiController],
   providers: [AppService, MysqlService],
