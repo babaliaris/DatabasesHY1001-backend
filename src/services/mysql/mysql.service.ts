@@ -95,7 +95,6 @@ export class MysqlService
                 else
                     sql_string = `SELECT * from tb_buyers;`;
 
-                console.log(`[getUsers]: ${sql_string}`);
 
                 const result = await session.sql(sql_string).execute();
 
@@ -301,7 +300,7 @@ export class MysqlService
 
 
 
-    getIncomes(productionId: number): Promise<Array<IncomeModel>>
+    getIncomes(landId: string, productionId: string): Promise<Array<IncomeModel>>
     {   
         return new Promise( async (res, rej)=>
         {
@@ -309,7 +308,7 @@ export class MysqlService
             {
                 const session: mysql.Session = await mysql.getSession(this.session_config);
                 
-                let sql_string = `SELECT * FROM tb_incomes WHERE m_productionId=${productionId};`;
+                let sql_string = `SELECT * FROM tb_incomes WHERE m_landId=${landId} AND m_productionId=${productionId};`;
 
                 const result = await session.sql(sql_string).execute();
 
@@ -346,7 +345,7 @@ export class MysqlService
 
 
 
-    getOutcomes(productionId: number): Promise<Array<OutcomeModel>>
+    getOutcomes(landId: string, productionId: string): Promise<Array<OutcomeModel>>
     {   
         return new Promise( async (res, rej)=>
         {
@@ -354,7 +353,7 @@ export class MysqlService
             {
                 const session: mysql.Session = await mysql.getSession(this.session_config);
                 
-                let sql_string = `SELECT * FROM tb_outcomes WHERE m_productionId=${productionId};`;
+                let sql_string = `SELECT * FROM tb_outcomes WHERE m_landId=${landId} AND m_productionId=${productionId};`;
 
                 const result = await session.sql(sql_string).execute();
 
@@ -448,6 +447,94 @@ export class MysqlService
                     ${land.longitude},\
                     "${land.seedType}",\
                     ${farmerId});`;
+
+                await session.sql(sql_string).execute();
+
+                session.close();
+
+                res(true);
+            }
+
+            catch(err)
+            {
+                rej(err);
+            }
+
+        });
+    }
+
+
+
+
+    /*
+    CREATE DEFINER='agro_farmer'@'localhost' PROCEDURE add_income(
+        IN farmerId BIGINT, -- Is guranteed to be the users actual id. Backend should retrieve it from a token hash.
+        IN name_ CHAR(40),
+        IN value_ REAL,
+        IN valueType ENUM ('CURRENCY','WEIGHT','VOLUME'),
+        IN productionId BIGINT,
+        IN landId BIGINT
+    )
+    */
+    addIncome(farmerId: string, landId: string, productionId: string, income: IncomeModel): Promise<boolean>
+    {   
+        return new Promise( async (res, rej)=>
+        {
+            try
+            {
+                const session: mysql.Session = await mysql.getSession(this.session_config);
+
+                const sql_string = `CALL add_income(
+                    ${farmerId},\
+                    "${income.name}",\
+                    ${income.value},\
+                    "${income.valueType}",\
+                    ${productionId},\
+                    ${landId});`;
+
+                await session.sql(sql_string).execute();
+
+                session.close();
+
+                res(true);
+            }
+
+            catch(err)
+            {
+                rej(err);
+            }
+
+        });
+    }
+
+
+
+
+    /**
+     * CREATE DEFINER='agro_farmer'@'localhost' PROCEDURE add_outcome(
+        IN farmerId BIGINT, -- Is guranteed to be the users actual id. Backend should retrieve it from a token hash.
+        IN name_ CHAR(40),
+        IN value_ REAL,
+        IN valueType ENUM ('CURRENCY','WEIGHT','VOLUME'),
+        IN productionId BIGINT,
+        IN landId BIGINT
+    )
+     */
+    addOutcome(farmerId: string, landId: string, productionId: string, outcome: OutcomeModel): Promise<boolean>
+    {   
+        return new Promise( async (res, rej)=>
+        {
+            try
+            {
+                const session: mysql.Session = await mysql.getSession(this.session_config);
+
+                const sql_string = `CALL add_outcome(
+                    ${farmerId},\
+                    "${outcome.name}",\
+                    ${outcome.value},\
+                    "${outcome.valueType}",\
+                    ${productionId},\
+                    ${landId});`;
 
                 await session.sql(sql_string).execute();
 

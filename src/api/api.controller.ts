@@ -113,7 +113,6 @@ export class ApiController
 
         catch(err)
         {   
-            console.log(err);
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -142,11 +141,11 @@ export class ApiController
     @Get("get_all_incomes")
     async getIncomes(@Req() request: Request)
     {
-        const {productionId} = request.query;
+        const {landId, productionId} = request.query;
 
         try
         {
-            const incomes: Array<IncomeModel> = await this.mysql.getIncomes((productionId as any) as number);
+            const incomes: Array<IncomeModel> = await this.mysql.getIncomes(landId as string, productionId as string);
 
             return incomes;
         }
@@ -163,11 +162,11 @@ export class ApiController
     @Get("get_all_outcomes")
     async getOutcomes(@Req() request: Request)
     {
-        const {productionId} = request.query;
+        const {landId, productionId} = request.query;
 
         try
         {
-            const outcomes: Array<IncomeModel> = await this.mysql.getOutcomes((productionId as any) as number);
+            const outcomes: Array<IncomeModel> = await this.mysql.getOutcomes(landId as string, productionId as string);
 
             return outcomes;
         }
@@ -208,6 +207,46 @@ export class ApiController
         try
         {
             const value = this.mysql.addLand(farmerId as string, request.body);
+
+            return value;
+        }
+
+        catch(err)
+        {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    @Post("add_income")
+    async addIncome(@Req() request: Request)
+    {
+        const {farmerId, landId, productionId} = request.query;
+
+        try
+        {
+            const value = this.mysql.addIncome(farmerId as string, landId as string, productionId as string, request.body);
+
+            return value;
+        }
+
+        catch(err)
+        {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    @Post("add_outcome")
+    async addOutcome(@Req() request: Request)
+    {
+        const {farmerId, landId, productionId} = request.query;
+
+        try
+        {
+            const value = this.mysql.addOutcome(farmerId as string, landId as string, productionId as string, request.body);
 
             return value;
         }
