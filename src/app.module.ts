@@ -8,8 +8,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [ServeStaticModule.forRoot({
-    rootPath: '/root/DatabasesHY1001-frontend/dist',
-    serveRoot: '/root/DatabasesHY1001-frontend/index.html'
+    rootPath: '/root/DatabasesHY1001-frontend/dist'
   })],
   controllers: [AppController, ApiController],
   providers: [AppService, MysqlService],
